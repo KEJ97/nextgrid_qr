@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PDF Viewer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- PDF.js 스타일시트 및 스크립트 참조 -->
+<link rel="stylesheet" href="/path/to/pdf_viewer.css">
+<script src="/path/to/pdf.js"></script>
+</head>
+<body>
+
+<div id="pdf-viewer"></div>
+
+<script>
+  pdfjsLib.GlobalWorkerOptions.workerSrc = '/path/to/pdf.worker.js';
+
+  var url = 'https://KEJ97.github.io/nextgrid_qr/nextgrid_catalogue.pdf'; // GitHub Pages에서 호스팅되는 PDF 파일의 경로
+  var loadingTask = pdfjsLib.getDocument(url);
+  loadingTask.promise.then(function(pdf) {
+    console.log('PDF loaded');
+    
+    // PDF의 첫 페이지를 가져오기
+    pdf.getPage(1).then(function(page) {
+      console.log('Page loaded');
+      
+      var scale = 1.5;
+      var viewport = page.getViewport({scale: scale});
+
+      // Canvas 준비 및 페이지 렌더링
+      var canvas = document.createElement('canvas');
+      var context = canvas.getContext('2d');
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+
+      document.getElementById('pdf-viewer').appendChild(canvas);
+
+      var renderContext = {
+        canvasContext: context,
+        viewport: viewport
+      };
+      var renderTask = page.render(renderContext);
+      renderTask.promise.then(function () {
+        console.log('Page rendered');
+      });
+    });
+  }, function(reason) {
+    console.error(reason);
+  });
+</script>
+
+</body>
+</html>
